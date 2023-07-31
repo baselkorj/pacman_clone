@@ -4,6 +4,8 @@
 #define DARKGOLD \
     CLITERAL(Color) { 179, 142, 0, 255 }
 
+#define BASE_GRID 20
+
 // Player Definitions
 typedef enum
 {
@@ -38,7 +40,6 @@ typedef struct
 
     struct
     {
-        int size;
         Color color;
         Color borderColor;
     } body;
@@ -46,6 +47,7 @@ typedef struct
 
 typedef struct
 {
+    bool debug;
     int score;
     int level;
 } Game;

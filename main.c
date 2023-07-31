@@ -38,12 +38,17 @@ int main(void)
         .score = 0,
         .level = 1};
 
+    char scoreText[30] = "";
+    char levelText[30] = "";
+    char fpsText[30] = "";
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        char scoreText[30] = {0};
-
-        sprintf(scoreText, "%d", game.score);
+        // update score, level, and fps texts
+        sprintf(scoreText, "SCORE : %d", game.score);
+        sprintf(levelText, "LEVEL : %d", game.level);
+        sprintf(fpsText, "FPS\t\t\t: %d", GetFPS());
 
         // draw pallet
         DrawCircle(pallet.position.x, pallet.position.y, 5, WHITE);
@@ -95,9 +100,12 @@ int main(void)
 
         BeginDrawing();
 
-        ClearBackground(BLACK);
+        // render texts
+        DrawText(fpsText, 10, 10, 14, WHITE);
+        DrawText(levelText, 10, 30, 14, WHITE);
+        DrawText(scoreText, 10, 50, 14, WHITE);
 
-        DrawText(scoreText, 10, 10, 14, WHITE);
+        ClearBackground(BLACK);
 
         // Draw Pac-Man body (yellow circle)
         int startAngle, endAngle;

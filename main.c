@@ -14,7 +14,7 @@ int main(void)
     const int screenWidth = 800;
     const int screenHeight = 450;
 
-    int currentGrid = 800 / BASE_GRID;
+    int gridSize = 800 / BASE_GRID_X;
 
     InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
@@ -29,7 +29,7 @@ int main(void)
         .mouth = {.end = 0, .start = 0, .angle = 0, .stat = MTH_CLOSING},
         .movement = {.position = {.x = screenWidth / 2, .y = screenHeight / 2}, .speed = 4, .direction = DRCT_RIGHT}};
 
-    Pallet pallet = {.position = {GetRandomValue(0 + currentGrid * 1.5, screenWidth - currentGrid * 1.5), GetRandomValue(0 + currentGrid * 1.5, screenHeight - currentGrid * 1.5)}};
+    Pallet pallet = {.position = {GetRandomValue(0 + gridSize * 1.5, screenWidth - gridSize * 1.5), GetRandomValue(0 + gridSize * 1.5, screenHeight - gridSize * 1.5)}};
 
     Game game = {
         .debug = true,
@@ -41,27 +41,25 @@ int main(void)
     char fpsText[30] = "";
 
     // collision map, 1 is collision
-    int collisionMap[20][30] = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    int collisionMap[18][32] = {
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     };
 
     // Main game loop
@@ -70,16 +68,16 @@ int main(void)
         // update score, level, and fps texts
         sprintf(scoreText, "SCORE : %d", game.score);
         sprintf(levelText, "LEVEL : %d", game.level);
-        sprintf(fpsText, "FPS\t\t\t: %d", GetFPS());
+        sprintf(fpsText, "FPS\t\t\t: %d", (int)(player.movement.position.x / gridSize));
 
         // draw pallet
         DrawCircle(pallet.position.x, pallet.position.y, 3, WHITE);
 
         // if pallet inside player circle
-        if (CheckCollisionPointCircle(pallet.position, player.movement.position, currentGrid))
+        if (CheckCollisionPointCircle(pallet.position, player.movement.position, gridSize))
         {
-            pallet.position.x = GetRandomValue(0 + currentGrid * 1.5, screenWidth - currentGrid * 1.5);
-            pallet.position.y = GetRandomValue(0 + currentGrid * 1.5, screenHeight - currentGrid * 1.5);
+            pallet.position.x = GetRandomValue(0 + gridSize * 1.5, screenWidth - gridSize * 1.5);
+            pallet.position.y = GetRandomValue(0 + gridSize * 1.5, screenHeight - gridSize * 1.5);
             game.score++;
         }
 
@@ -112,26 +110,26 @@ int main(void)
             player.movement.direction = DRCT_DOWN;
 
         if (player.movement.direction == DRCT_RIGHT)
-            player.movement.position.x += player.movement.position.x < screenWidth - (currentGrid / 2) ? player.movement.speed : 0.0f;
+            player.movement.position.x += !collisionMap[(int)(player.movement.position.y / gridSize)][(int)(player.movement.position.x / gridSize) + 1] ? player.movement.speed : 0.0f;
         else if (player.movement.direction == DRCT_LEFT)
-            player.movement.position.x -= player.movement.position.x > (currentGrid / 2) ? player.movement.speed : 0.0f;
+            player.movement.position.x -= !collisionMap[(int)(player.movement.position.y / gridSize)][(int)(player.movement.position.x / gridSize) - 1] ? player.movement.speed : 0.0f;
         else if (player.movement.direction == DRCT_UP)
-            player.movement.position.y -= player.movement.position.y > (currentGrid / 2) ? player.movement.speed : 0.0f;
+            player.movement.position.y -= !collisionMap[(int)(player.movement.position.y / gridSize) - 1][(int)(player.movement.position.x / gridSize)] ? player.movement.speed : 0.0f;
         else if (player.movement.direction == DRCT_DOWN)
-            player.movement.position.y += player.movement.position.y < screenHeight - (currentGrid / 2) ? player.movement.speed : 0.0f;
+            player.movement.position.y += !collisionMap[(int)(player.movement.position.y / gridSize) + 1][(int)(player.movement.position.x / gridSize)] ? player.movement.speed : 0.0f;
 
         BeginDrawing();
 
         // visualize collision map
         if (game.debug)
         {
-            for (int i = 0; i < screenWidth / currentGrid; i++)
+            for (int i = 0; i < screenWidth / gridSize; i++)
             {
-                for (int j = 0; j < screenHeight / currentGrid; j++)
+                for (int j = 0; j < screenHeight / gridSize; j++)
                 {
                     if (collisionMap[j][i])
                     {
-                        DrawRectangle(i * currentGrid, j * currentGrid, currentGrid, currentGrid, CLITERAL(Color){255, 255, 255, 50});
+                        DrawRectangle(i * gridSize, j * gridSize, gridSize, gridSize, CLITERAL(Color){255, 255, 255, 50});
                     }
                 }
             }
@@ -169,8 +167,8 @@ int main(void)
             endAngle = 405 - player.mouth.angle;
         }
 
-        DrawCircleSector(player.movement.position, (currentGrid / 2) - 5, startAngle, endAngle, 0, DARKGOLD);
-        DrawCircleSector(player.movement.position, (currentGrid / 2) - 8, startAngle, endAngle, 0, GOLD);
+        DrawCircleSector(player.movement.position, gridSize / 1.5, startAngle, endAngle, 0, DARKGOLD);
+        DrawCircleSector(player.movement.position, (gridSize / 1.5) - 2, startAngle, endAngle, 0, GOLD);
 
         EndDrawing();
         //----------------------------------------------------------------------------------

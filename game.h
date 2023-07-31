@@ -4,7 +4,8 @@
 #define DARKGOLD \
     CLITERAL(Color) { 179, 142, 0, 255 }
 
-#define BASE_GRID 20
+#define BASE_GRID_X 32
+#define BASE_GRID_Y 18
 
 // Player Definitions
 typedef enum

@@ -1,10 +1,15 @@
 #include "raylib.h"
 #include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 
 #define PLDR_RIGHT 0
 #define PLDR_LEFT 1
 #define PLDR_UP 2
 #define PLDR_DOWN 3
+
+#define DARKGOLD \
+    CLITERAL(Color) { 179, 142, 0, 255 }
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -27,12 +32,29 @@ int main(void)
 
     int playerSetDirection = PLDR_RIGHT;
 
+    int score = 0;
+
+    srand(time(NULL));
+
+    Vector2 palletPosition = {rand() % screenWidth, rand() % screenHeight};
+
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
-        char frameTime[30] = {0};
+        char scoreText[30] = {0};
 
-        sprintf(frameTime, "%lf", GetTime());
+        sprintf(scoreText, "%d", score);
+
+        // draw pallet
+        DrawCircle(palletPosition.x, palletPosition.y, 5, WHITE);
+
+        // if pallet inside player circle
+        if (CheckCollisionPointCircle(palletPosition, playerPosition, 25))
+        {
+            palletPosition.x = rand() % screenWidth;
+            palletPosition.y = rand() % screenHeight;
+            score++;
+        }
 
         if (mouthOpening)
         {
@@ -63,19 +85,19 @@ int main(void)
             playerSetDirection = PLDR_DOWN;
 
         if (playerSetDirection == PLDR_RIGHT)
-            playerPosition.x += 4.0f;
+            playerPosition.x += playerPosition.x < screenWidth - 25 ? 4.0f : 0.0f;
         else if (playerSetDirection == PLDR_LEFT)
-            playerPosition.x -= 4.0f;
+            playerPosition.x -= playerPosition.x > 0 + 25 ? 4.0f : 0.0f;
         else if (playerSetDirection == PLDR_UP)
-            playerPosition.y -= 4.0f;
+            playerPosition.y -= playerPosition.y > 0 + 25 ? 4.0f : 0.0f;
         else if (playerSetDirection == PLDR_DOWN)
-            playerPosition.y += 4.0f;
+            playerPosition.y += playerPosition.y < screenHeight - 25 ? 4.0f : 0.0f;
 
         BeginDrawing();
 
         ClearBackground(DARKGRAY);
 
-        DrawText(frameTime, 10, 10, 14, LIGHTGRAY);
+        DrawText(scoreText, 10, 10, 14, LIGHTGRAY);
 
         // Draw Pac-Man body (yellow circle)
         int startAngle, endAngle;
@@ -102,7 +124,8 @@ int main(void)
             endAngle = 405 - mouthAngle;
         }
 
-        DrawCircleSector(playerPosition, radius, startAngle, endAngle, 0, YELLOW);
+        DrawCircleSector(playerPosition, 23, startAngle, endAngle, 0, DARKGOLD);
+        DrawCircleSector(playerPosition, radius, startAngle, endAngle, 0, GOLD);
 
         EndDrawing();
         //----------------------------------------------------------------------------------

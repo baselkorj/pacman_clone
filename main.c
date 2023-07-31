@@ -3,13 +3,12 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define PLDR_RIGHT 0
-#define PLDR_LEFT 1
-#define PLDR_UP 2
-#define PLDR_DOWN 3
+#include "game.h"
 
-#define DARKGOLD \
-    CLITERAL(Color) { 179, 142, 0, 255 }
+int random_int(int min, int max)
+{
+    return min + rand() % (max + 1 - min);
+}
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -23,109 +22,110 @@ int main(void)
 
     SetTargetFPS(60); // Set our game to run at 60 frames-per-second
 
-    Vector2 playerPosition = {screenWidth / 2, screenHeight / 2};
-
-    float radius = 20.0f;
-    int mouthAngle = 90;
-
-    bool mouthOpening = true;
-
-    int playerSetDirection = PLDR_RIGHT;
-
-    int score = 0;
-
     srand(time(NULL));
 
-    Vector2 palletPosition = {rand() % screenWidth, rand() % screenHeight};
+    Player player = {
+        .body = {
+            .borderColor = DARKGOLD,
+            .color = GOLD,
+            .size = 20},
+        .mouth = {.end = 0, .start = 0, .angle = 0, .stat = MTH_CLOSING},
+        .movement = {.position = {.x = screenWidth / 2, .y = screenHeight / 2}, .speed = 5, .direction = DRCT_RIGHT}};
+
+    Pallet pallet = {.position = {random_int(0 + player.body.size, screenWidth - player.body.size), random_int(0 + player.body.size, screenHeight - player.body.size)}};
+
+    Game game = {
+        .score = 0,
+        .level = 1};
 
     // Main game loop
     while (!WindowShouldClose()) // Detect window close button or ESC key
     {
         char scoreText[30] = {0};
 
-        sprintf(scoreText, "%d", score);
+        sprintf(scoreText, "%d", game.score);
 
         // draw pallet
-        DrawCircle(palletPosition.x, palletPosition.y, 5, WHITE);
+        DrawCircle(pallet.position.x, pallet.position.y, 5, WHITE);
 
         // if pallet inside player circle
-        if (CheckCollisionPointCircle(palletPosition, playerPosition, 25))
+        if (CheckCollisionPointCircle(pallet.position, player.movement.position, player.body.size - 5))
         {
-            palletPosition.x = rand() % screenWidth;
-            palletPosition.y = rand() % screenHeight;
-            score++;
+            pallet.position.x = random_int(0 + player.body.size, screenWidth - player.body.size);
+            pallet.position.y = random_int(0 + player.body.size, screenHeight - player.body.size);
+            game.score++;
         }
 
-        if (mouthOpening)
+        if (player.mouth.stat == MTH_OPENING)
         {
-            mouthAngle -= 15;
+            player.mouth.angle -= player.movement.speed * 3;
 
-            if (mouthAngle <= 0)
+            if (player.mouth.angle <= 0)
             {
-                mouthOpening = false;
+                player.mouth.stat = MTH_CLOSING;
             }
         }
         else
         {
-            mouthAngle += 15;
+            player.mouth.angle += player.movement.speed * 3;
 
-            if (mouthAngle >= 105)
+            if (player.mouth.angle >= 105)
             {
-                mouthOpening = true;
+                player.mouth.stat = MTH_OPENING;
             }
         }
 
         if (IsKeyDown(KEY_RIGHT))
-            playerSetDirection = PLDR_RIGHT;
+            player.movement.direction = DRCT_RIGHT;
         if (IsKeyDown(KEY_LEFT))
-            playerSetDirection = PLDR_LEFT;
+            player.movement.direction = DRCT_LEFT;
         if (IsKeyDown(KEY_UP))
-            playerSetDirection = PLDR_UP;
+            player.movement.direction = DRCT_UP;
         if (IsKeyDown(KEY_DOWN))
-            playerSetDirection = PLDR_DOWN;
+            player.movement.direction = DRCT_DOWN;
 
-        if (playerSetDirection == PLDR_RIGHT)
-            playerPosition.x += playerPosition.x < screenWidth - 25 ? 4.0f : 0.0f;
-        else if (playerSetDirection == PLDR_LEFT)
-            playerPosition.x -= playerPosition.x > 0 + 25 ? 4.0f : 0.0f;
-        else if (playerSetDirection == PLDR_UP)
-            playerPosition.y -= playerPosition.y > 0 + 25 ? 4.0f : 0.0f;
-        else if (playerSetDirection == PLDR_DOWN)
-            playerPosition.y += playerPosition.y < screenHeight - 25 ? 4.0f : 0.0f;
+        if (player.movement.direction == DRCT_RIGHT)
+            player.movement.position.x += player.movement.position.x < screenWidth - 25 ? player.movement.speed : 0.0f;
+        else if (player.movement.direction == DRCT_LEFT)
+            player.movement.position.x -= player.movement.position.x > 0 + 25 ? player.movement.speed : 0.0f;
+        else if (player.movement.direction == DRCT_UP)
+            player.movement.position.y -= player.movement.position.y > 0 + 25 ? player.movement.speed : 0.0f;
+        else if (player.movement.direction == DRCT_DOWN)
+            player.movement.position.y += player.movement.position.y < screenHeight - 25 ? player.movement.speed : 0.0f;
 
         BeginDrawing();
 
-        ClearBackground(DARKGRAY);
+        ClearBackground(BLACK);
 
-        DrawText(scoreText, 10, 10, 14, LIGHTGRAY);
+        DrawText(scoreText, 10, 10, 14, WHITE);
 
         // Draw Pac-Man body (yellow circle)
         int startAngle, endAngle;
 
         // Calculate start and end angles based on player direction
-        if (playerSetDirection == PLDR_RIGHT)
+        if (player.movement.direction == DRCT_RIGHT)
         {
-            startAngle = 90 + mouthAngle / 2;
-            endAngle = 495 - mouthAngle;
+            startAngle = 90 + player.mouth.angle / 2;
+            endAngle = 495 - player.mouth.angle;
         }
-        else if (playerSetDirection == PLDR_LEFT)
+        else if (player.movement.direction == DRCT_LEFT)
         {
-            startAngle = -90 + mouthAngle / 2;
-            endAngle = 315 - mouthAngle;
+            startAngle = -90 + player.mouth.angle / 2;
+            endAngle = 315 - player.mouth.angle;
         }
-        else if (playerSetDirection == PLDR_UP)
+        else if (player.movement.direction == DRCT_UP)
         {
-            startAngle = 180 + mouthAngle / 2;
-            endAngle = 585 - mouthAngle;
+            startAngle = 180 + player.mouth.angle / 2;
+            endAngle = 585 - player.mouth.angle;
         }
-        else if (playerSetDirection == PLDR_DOWN)
+        else if (player.movement.direction == DRCT_DOWN)
         {
-            startAngle = 0 + mouthAngle / 2;
-            endAngle = 405 - mouthAngle;
+            startAngle = 0 + player.mouth.angle / 2;
+            endAngle = 405 - player.mouth.angle;
         }
 
-        DrawCircleSector(playerPosition, 23, startAngle, endAngle, 0, DARKGOLD);
-        DrawCircleSector(playerPosition, radius, startAngle, endAngle, 0, GOLD);
+        DrawCircleSector(player.movement.position, player.body.size + 3, startAngle, endAngle, 0, DARKGOLD);
+        DrawCircleSector(player.movement.position, player.body.size, startAngle, endAngle, 0, GOLD);
 
         EndDrawing();
         //----------------------------------------------------------------------------------

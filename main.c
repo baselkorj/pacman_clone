@@ -57,7 +57,7 @@ int main(void)
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+        {1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
     };
@@ -110,13 +110,13 @@ int main(void)
             player.movement.direction = DRCT_DOWN;
 
         if (player.movement.direction == DRCT_RIGHT)
-            player.movement.position.x += !collisionMap[(int)(player.movement.position.y / gridSize)][(int)(player.movement.position.x / gridSize) + 1] ? player.movement.speed : 0.0f;
+            player.movement.position.x += !collisionMap[(int)(player.movement.position.y / gridSize)][(int)((player.movement.position.x + (gridSize / 2)) / gridSize)] ? player.movement.speed : 0.0f;
         else if (player.movement.direction == DRCT_LEFT)
-            player.movement.position.x -= !collisionMap[(int)(player.movement.position.y / gridSize)][(int)(player.movement.position.x / gridSize) - 1] ? player.movement.speed : 0.0f;
+            player.movement.position.x -= !collisionMap[(int)(player.movement.position.y / gridSize)][(int)((player.movement.position.x - (gridSize / 2) - 3) / gridSize)] ? player.movement.speed : 0.0f;
         else if (player.movement.direction == DRCT_UP)
-            player.movement.position.y -= !collisionMap[(int)(player.movement.position.y / gridSize) - 1][(int)(player.movement.position.x / gridSize)] ? player.movement.speed : 0.0f;
+            player.movement.position.y -= !collisionMap[(int)((player.movement.position.y - (gridSize / 2) - 5) / gridSize)][(int)(player.movement.position.x / gridSize)] ? player.movement.speed : 0.0f;
         else if (player.movement.direction == DRCT_DOWN)
-            player.movement.position.y += !collisionMap[(int)(player.movement.position.y / gridSize) + 1][(int)(player.movement.position.x / gridSize)] ? player.movement.speed : 0.0f;
+            player.movement.position.y += !collisionMap[(int)((player.movement.position.y + (gridSize / 2)) / gridSize)][(int)(player.movement.position.x / gridSize)] ? player.movement.speed : 0.0f;
 
         BeginDrawing();
 
@@ -167,8 +167,8 @@ int main(void)
             endAngle = 405 - player.mouth.angle;
         }
 
-        DrawCircleSector(player.movement.position, gridSize / 1.5, startAngle, endAngle, 0, DARKGOLD);
-        DrawCircleSector(player.movement.position, (gridSize / 1.5) - 2, startAngle, endAngle, 0, GOLD);
+        DrawCircleSector(player.movement.position, (gridSize / 2), startAngle, endAngle, 0, DARKGOLD);
+        DrawCircleSector(player.movement.position, (gridSize / 2) - 3, startAngle, endAngle, 0, GOLD);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
